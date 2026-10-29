@@ -7,7 +7,11 @@
   // One row per problem found in a merged ticket. The desk's one-day-move reports are their own
   // problem: the date moves by a day, it is not flipped, so neither parser nor hint explains them.
   type Problem = 'parser' | 'hint' | 'one-day' | 'unplaced';
-  let { ticket, issues = {} }: { ticket: number; issues?: Partial<Record<Problem, string>> } = $props();
+  let {
+    ticket,
+    issues = {},
+    states = {},
+  }: { ticket: number; issues?: Partial<Record<Problem, string>>; states?: Partial<Record<Problem, string>> } = $props();
 
   const LABEL: Record<Problem, string> = {
     parser: 'day and month flipped by the shared parser',
@@ -44,7 +48,7 @@
 
 <table>
   <thead>
-    <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>intake tagged otherwise</th><th>ticket</th></tr>
+    <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>intake tagged otherwise</th><th>ticket</th><th>state</th></tr>
   </thead>
   <tbody>
     {#each rows.groups as g (g.problem)}
@@ -55,6 +59,7 @@
         <td>{g.channels}</td>
         <td>{g.mistagged}</td>
         <td>{#if issues[g.problem]}<a href={issues[g.problem]}>{issues[g.problem]?.split('/').pop()?.replace(/^/, '#')}</a>{:else}—{/if}</td>
+        <td class:open={states[g.problem] === 'open'}>{states[g.problem] ?? '—'}</td>
       </tr>
     {/each}
   </tbody>
@@ -62,4 +67,5 @@
 
 <style>
   .sum { font-size: 1.1rem; }
+  .open { color: var(--warn); font-weight: 600; }
 </style>

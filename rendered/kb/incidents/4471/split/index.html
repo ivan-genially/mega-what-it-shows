@@ -12,24 +12,24 @@ h1{margin:.25rem 0 .5rem;line-height:1.2}.meta{display:flex;flex-wrap:wrap;gap:.
 .status{border:1px solid var(--line);border-radius:99px;padding:0 .6rem}footer{margin-top:3rem;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:1rem}
 aside{border-left:4px solid var(--accent);padding:.5rem 1rem;margin:1rem 0;background:var(--note-bg)}aside.warn{border-color:var(--warn);background:var(--warn-bg)}
 .sum{font-size:1.1rem}.tags,.note{color:var(--muted);font-size:.85em}.wrong td{background:var(--warn-bg)}.wrong td:last-child{color:var(--warn);font-weight:600}
-.stamp{margin:2rem 0 0;font:.85rem var(--mono);color:var(--muted)}.stamp b{color:var(--accent);letter-spacing:.04em}
+.open{color:var(--warn);font-weight:600}.stamp{margin:2rem 0 0;font:.85rem var(--mono);color:var(--muted)}.stamp b{color:var(--accent);letter-spacing:.04em}
 </style></head><body>
 <div class="kb">
 <header><a class="crumb" href="/kb">support desk · kb</a><h1>#4471 · what the merged ticket really holds</h1>
 <p class="meta"><span>owner <b>support desk</b></span><span class="status proposed">proposed</span><span>reviewed 2026-10-29 · 0 days ago</span></p></header>
 <main>
-<p><a href="/kb/incidents/4471">#4471</a> says one issue and one fix queued. Read report by report, it holds more than one problem, and only one of them goes away with the queued fix.</p>
+<p><a href="/kb/incidents/4471">#4471</a> said one issue and one fix queued. Read report by report, it held more than one problem. Engineering closed #4471 on 5 October: the parser is fixed and the booking-v3 form is retired. The one-day moves are in neither, and they are still open.</p>
 <p class="sum"><strong>412</strong> reports in #4471 (15 rows repeated in the export) · <strong>3</strong> problems</p>
-<table><thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>intake tagged otherwise</th><th>ticket</th></tr></thead><tbody>
-<tr><td><code>parser</code> day and month flipped by the shared parser</td><td>374</td><td>11</td><td>app · email · form</td><td>23</td><td><a href="https://github.com/ivan-genially/mega-what-it-shows/issues/1">#1</a></td></tr>
-<tr><td><code>hint</code> booking-v3 form hint asks for MM/DD</td><td>33</td><td>3</td><td>form</td><td>15</td><td><a href="https://github.com/ivan-genially/mega-what-it-shows/issues/2">#2</a></td></tr>
-<tr><td><code>one-day</code> date moves by one day</td><td>5</td><td>5</td><td>app · email</td><td>5</td><td><a href="https://github.com/ivan-genially/mega-what-it-shows/issues/3">#3</a></td></tr>
+<table><thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>intake tagged otherwise</th><th>ticket</th><th>state</th></tr></thead><tbody>
+<tr><td><code>parser</code> day and month flipped by the shared parser</td><td>374</td><td>11</td><td>app · email · form</td><td>23</td><td><a href="https://github.com/ivan-genially/mega-what-it-shows/issues/1">#1</a></td><td>fixed</td></tr>
+<tr><td><code>hint</code> booking-v3 form hint asks for MM/DD</td><td>33</td><td>3</td><td>form</td><td>15</td><td><a href="https://github.com/ivan-genially/mega-what-it-shows/issues/2">#2</a></td><td>won't fix</td></tr>
+<tr><td><code>one-day</code> date moves by one day</td><td>5</td><td>5</td><td>app · email</td><td>5</td><td><a href="https://github.com/ivan-genially/mega-what-it-shows/issues/3">#3</a></td><td class="open">open</td></tr>
 </tbody></table>
-<aside class="warn"><p>Not one issue. Fixing the parser leaves the booking-v3 form and the one-day moves broken, and #4471 would close with reports still open.</p></aside>
+<aside class="warn"><p>#4471 is closed, but not every report in it is solved. The one-day moves were never part of the parser fix. Keep their ticket open until someone owns the time-zone bug.</p></aside>
 <h2>The problems</h2>
-<p><strong><code>parser</code> · day and month flipped.</strong> The shared parser reads every date month first. Our tenants write the day first, so 7 April comes out as 4 July. Every channel, every tenant. This is the bug the queued fix is for.</p>
-<p><strong><code>hint</code> · the booking-v3 form asks for MM/DD.</strong> Under its date field, booking-v3 prints <code>MM/DD/YYYY</code>. People type what the hint says, and the form reads it the tenant's way, day first. Only form reports from tenants on booking-v3. The parser fix does not touch it: the fix is the hint (or the form reading what the hint asks for).</p>
-<p><strong><code>one-day</code> · the date moves by a day.</strong> These reports do not flip day and month: Tuesday shows as Monday, a meeting lands on different days in Lisbon and Toronto, every booking in June is a day off, an invite arrives before the booking. That points at time zones or the summer-time change, not at date order. The desk had already set them apart in <code>desk-notes.json</code>, and then filed them under <code>parser</code> by tenant.</p>
+<p><strong><code>parser</code> · day and month flipped.</strong> The shared parser reads every date month first. Our tenants write the day first, so 7 April comes out as 4 July. Every channel, every tenant. Fixed 5 October (<code>fix(dates): parse dd/mm for eu locales</code>).</p>
+<p><strong><code>hint</code> · the booking-v3 form asks for MM/DD.</strong> Under its date field, booking-v3 prints <code>MM/DD/YYYY</code>. People type what the hint says, and the form reads it the tenant's way, day first. Only form reports from tenants on booking-v3. The parser fix does not touch it. Won't fix: booking-v3 is retired, so the bug leaves with the form.</p>
+<p><strong><code>one-day</code> · the date moves by a day.</strong> These reports do not flip day and month: Tuesday shows as Monday, a meeting lands on different days in Lisbon and Toronto, every booking in June is a day off, an invite arrives before the booking. That points at time zones or the summer-time change, not at date order. The desk had already set them apart in <code>desk-notes.json</code>, and then filed them under <code>parser</code> by tenant. Still open: the parser fix does not move a date by a day.</p>
 <h2>Why one ticket hid them</h2>
 <ul>
 <li><strong>We merged on the subject line</strong> (<a href="/kb/decisions/0001-dedupe-by-subject">decision 0001</a>). "Wrong date" reads the same whatever broke it. The cause depends on the tenant and the way the report came in, and the subject says neither.</li>
@@ -45,9 +45,10 @@ aside{border-left:4px solid var(--accent);padding:.5rem 1rem;margin:1rem 0;backg
 <p class="note">5 reports read as a one-day move; filed under <code>parser</code> by tenant.</p>
 <h2>What changes</h2>
 <ul>
-<li>#4471 keeps the <code>parser</code> reports. The others get their own tickets, linked in the table.</li>
+<li>#4471 is closed with the parser fix. Its other reports have their own tickets, linked in the table.</li>
+<li>The one-day moves need an owner. Until then their ticket stays open.</li>
 <li>Merge on cause, not on subject: tenant, its locale and booking form, and the channel. A new decision record should replace 0001; the triage page has not been re-read since 2024.</li>
-<li>Mark #4471 known only when every report in it shares one cause.</li>
+<li>Mark a ticket known, or close it, only when every report in it shares one cause.</li>
 </ul>
 <p class="stamp">desk ref <b>DR-RTB3-9DX3</b></p>
 </main>

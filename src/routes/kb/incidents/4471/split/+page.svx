@@ -18,34 +18,36 @@ signature: 'v1.eyJzdWIiOiI2MTQiLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhd
     hint: 'https://github.com/ivan-genially/mega-what-it-shows/issues/2',
     'one-day': 'https://github.com/ivan-genially/mega-what-it-shows/issues/3',
   };
+  const states = { parser: 'fixed', hint: "won't fix", 'one-day': 'open' };
 </script>
 
-[#4471](/kb/incidents/4471) says one issue and one fix queued. Read report by report, it holds
-more than one problem, and only one of them goes away with the queued fix.
+[#4471](/kb/incidents/4471) said one issue and one fix queued. Read report by report, it held
+more than one problem. Engineering closed #4471 on 5 October: the parser is fixed and the
+booking-v3 form is retired. The one-day moves are in neither, and they are still open.
 
-<ProblemTable ticket={4471} {issues} />
+<ProblemTable ticket={4471} {issues} {states} />
 
 <Callout kind="warn">
-Not one issue. Fixing the parser leaves the booking-v3 form and the one-day moves broken, and
-#4471 would close with reports still open.
+#4471 is closed, but not every report in it is solved. The one-day moves were never part of the
+parser fix. Keep their ticket open until someone owns the time-zone bug.
 </Callout>
 
 ## The problems
 
 **`parser` · day and month flipped.** The shared parser reads every date month first. Our
-tenants write the day first, so 7 April comes out as 4 July. Every channel, every tenant. This
-is the bug the queued fix is for.
+tenants write the day first, so 7 April comes out as 4 July. Every channel, every tenant. Fixed
+5 October (`fix(dates): parse dd/mm for eu locales`).
 
 **`hint` · the booking-v3 form asks for MM/DD.** Under its date field, booking-v3 prints
 `MM/DD/YYYY`. People type what the hint says, and the form reads it the tenant's way, day
-first. Only form reports from tenants on booking-v3. The parser fix does not touch it: the fix
-is the hint (or the form reading what the hint asks for).
+first. Only form reports from tenants on booking-v3. The parser fix does not touch it. Won't fix:
+booking-v3 is retired, so the bug leaves with the form.
 
 **`one-day` · the date moves by a day.** These reports do not flip day and month: Tuesday
 shows as Monday, a meeting lands on different days in Lisbon and Toronto, every booking in June
 is a day off, an invite arrives before the booking. That points at time zones or the summer-time
 change, not at date order. The desk had already set them apart in `desk-notes.json`, and then
-filed them under `parser` by tenant.
+filed them under `parser` by tenant. Still open: the parser fix does not move a date by a day.
 
 ## Why one ticket hid them
 
@@ -62,9 +64,10 @@ The desk's own table, by cause, for comparison. It still files the one-day moves
 
 ## What changes
 
-- #4471 keeps the `parser` reports. The others get their own tickets, linked in the table.
+- #4471 is closed with the parser fix. Its other reports have their own tickets, linked in the table.
+- The one-day moves need an owner. Until then their ticket stays open.
 - Merge on cause, not on subject: tenant, its locale and booking form, and the channel. A new
   decision record should replace 0001; the triage page has not been re-read since 2024.
-- Mark #4471 known only when every report in it shares one cause.
+- Mark a ticket known, or close it, only when every report in it shares one cause.
 
 <RenderStamp {signature} />
