@@ -1,0 +1,70 @@
+---
+layout: runbook
+title: '#4471 · what the merged ticket really holds'
+owner: support desk
+status: proposed
+reviewed: 2026-10-29
+signature: 'v1.eyJzdWIiOiI2MTQiLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhdCI6MTc5MzMxMDIzMSwiZXhwIjoxNzkzMzk2NjMxfQ.pOgmZCz4rrK2FDrt83JocH9g5yQ3-kSI5TgNkSHr4k0'
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const issues = {
+    parser: 'https://github.com/ivan-genially/mega-what-it-shows/issues/1',
+    hint: 'https://github.com/ivan-genially/mega-what-it-shows/issues/2',
+    'one-day': 'https://github.com/ivan-genially/mega-what-it-shows/issues/3',
+  };
+</script>
+
+[#4471](/kb/incidents/4471) says one issue and one fix queued. Read report by report, it holds
+more than one problem, and only one of them goes away with the queued fix.
+
+<ProblemTable ticket={4471} {issues} />
+
+<Callout kind="warn">
+Not one issue. Fixing the parser leaves the booking-v3 form and the one-day moves broken, and
+#4471 would close with reports still open.
+</Callout>
+
+## The problems
+
+**`parser` · day and month flipped.** The shared parser reads every date month first. Our
+tenants write the day first, so 7 April comes out as 4 July. Every channel, every tenant. This
+is the bug the queued fix is for.
+
+**`hint` · the booking-v3 form asks for MM/DD.** Under its date field, booking-v3 prints
+`MM/DD/YYYY`. People type what the hint says, and the form reads it the tenant's way, day
+first. Only form reports from tenants on booking-v3. The parser fix does not touch it: the fix
+is the hint (or the form reading what the hint asks for).
+
+**`one-day` · the date moves by a day.** These reports do not flip day and month: Tuesday
+shows as Monday, a meeting lands on different days in Lisbon and Toronto, every booking in June
+is a day off, an invite arrives before the booking. That points at time zones or the summer-time
+change, not at date order. The desk had already set them apart in `desk-notes.json`, and then
+filed them under `parser` by tenant.
+
+## Why one ticket hid them
+
+- **We merged on the subject line** ([decision 0001](/kb/decisions/0001-dedupe-by-subject)).
+  "Wrong date" reads the same whatever broke it. The cause depends on the tenant and the way the
+  report came in, and the subject says neither.
+- **The intake tag is a guess** from the reporter's browser, not from the tenant. Counting by tag
+  gives wrong totals both ways; the column above shows how many each problem would lose.
+- **The export repeats rows** where its pages overlap. Count by report id, once.
+
+The desk's own table, by cause, for comparison. It still files the one-day moves under `parser`:
+
+<CauseTable ticket={4471} />
+
+## What changes
+
+- #4471 keeps the `parser` reports. The others get their own tickets, linked in the table.
+- Merge on cause, not on subject: tenant, its locale and booking form, and the channel. A new
+  decision record should replace 0001; the triage page has not been re-read since 2024.
+- Mark #4471 known only when every report in it shares one cause.
+
+<RenderStamp {signature} />
